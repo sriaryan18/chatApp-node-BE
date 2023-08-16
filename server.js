@@ -10,13 +10,19 @@ const { authenticateJWT, autheticateJWTsockets } = require('./middleware/authMid
 const app =express();
 
 const server =require('http').createServer(app)
-const io = require('socket.io')(server);
+const io = require('socket.io')(server,{
+    cors: {
+        origin: process.env.FRONTEND_HOST
+      }
+});
 
 
 
 app.use(cors({
     origin:process.env.FRONTEND_HOST
 }))
+
+
 app.use(bodyParser.json());
 
 app.get('/',(req,res)=>{

@@ -36,7 +36,7 @@ const SocketIo = (io)=>{
             const usernameDisconnected = reverseLoopkup[socket.id];
             delete onlineUsers[usernameDisconnected];
             delete reverseLoopkup[socket.id];
-            console.log("I am online users after disconnection",Object.keys(onlineUsers));
+            console.log("I am online users after a disconnection",Object.keys(onlineUsers));
         })
     });
 }

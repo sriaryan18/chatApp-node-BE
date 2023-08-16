@@ -21,7 +21,7 @@ const autheticateJWTsockets = (socket,next)=>{
     try{
        
     const token = socket?.handshake?.query?.token;
-    // console.log("I am token=>",token);
+    // console.log("I am token=>",socket);
     if(!token){
         next(new Error("Authetication Error"));
     }
