@@ -11,4 +11,4 @@ const chatSchema = new Schema({
 
 const Chat = Mongoose.model("Chat",chatSchema);
 
-export default Chat;
+module.exports= Chat;

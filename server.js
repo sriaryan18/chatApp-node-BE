@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes')
 const express = require('express');
 const cors = require('cors');
 const {SocketIo}  = require('./socketIO');
+const { authenticateJWT, autheticateJWTsockets } = require('./middleware/authMiddleWare');
 const app =express();
 
 const server =require('http').createServer(app)
@@ -29,6 +30,7 @@ app.use(notFound);
  
 
 // *Websockets connection and configuration starts*//
+io.use(autheticateJWTsockets)
 SocketIo(io);
 
 const port = process.env.PORT || 3000
