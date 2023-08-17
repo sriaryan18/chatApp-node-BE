@@ -8,6 +8,10 @@ const userSchema =  new Schema({
   password: { type: String, required: true },
   lastLogin: { type: Date, default: null },
   emailId: { type: String, required: true },
+  connectRequests :[{
+    targetUsername:{type:String,ref:'User'},
+    timeStamp:{type:Date,default:Date.now}
+  }],
   connects:[
     {
       username:{type:String,ref:'User'},
