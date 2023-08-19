@@ -29,13 +29,21 @@ const saveMessageDb = async (data)=>{
 const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername)=>{
     try{
 
-        const isSent =await User.findOne({
-         'connectRequests.targetUsername':toUsername
-        });
-        if(isSent){
-         return true;
-        }
+        const user =await User.findOne(
+         {username:fromUsername}
+        );
+         if(user){
+            const connectRequests = user?.connectRequests;
+            let isPresent = false;
+            connectRequests.forEach((req)=>{
+                if(req.targetUsername === toUsername) isPresent = true;
+            });
+            console.log('isPresent',isPresent);
+            return isPresent;
+         }
+      
     }catch(err){
+        console.log("error at check",err)
         return false;
     }
 }

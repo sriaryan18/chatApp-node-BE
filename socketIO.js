@@ -43,12 +43,15 @@ const SocketIo = (io)=>{
         })
         socket.on('friend-request',async (data)=>{
             const {to,from} = data;
+            if(to === from) return;
             try{
                 const isAlreadySent=await checkDatabaseIfReqAlreadySent(from,to);
-                
+                console.log('I am AlreadySent',isAlreadySent);
                 if(!isAlreadySent){
                     const targetUserSocket = onlineUsers[to];
-                    targetUserSocket.emit('friendRequest',{from});
+                    if(targetUserSocket){
+                        targetUserSocket.emit('friendRequest',{from});
+                    }
                     await saveConnectionRequest(from,to);
                 }
             }catch(err){
