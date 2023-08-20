@@ -30,7 +30,6 @@ app.get('/',(req,res)=>{
 });
 
 app.use('/user',userRoutes)
-
 app.use(errorHandler);
 app.use(notFound);
  

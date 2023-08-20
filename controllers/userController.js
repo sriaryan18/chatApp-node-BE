@@ -67,9 +67,11 @@ const checkUserName = asyncHandler(async (req,res)=>{
 const login = asyncHandler(async(req,res,next)=>{
     try{
          const {username,password} = req.body;
+         
         const isUsernamePresent = await User.findOne({
             username:username
         });
+
         if(!isUsernamePresent){
             res.status(400).send("USERNAME DOES NOT EXISTS")
 //            throw new Error("USER DOES NOT EXISTS");
@@ -84,7 +86,9 @@ const login = asyncHandler(async(req,res,next)=>{
                 const token = jwt.sign({username},process.env.SECRET_KEY_LOGIN,{
                     expiresIn:process.env.JWT_EXPIRE_TIME
                 });
-                res.status(200).send(token);
+                const responseToSend={userInfo:isUsernamePresent.LoginSuccessData,token};
+
+                res.status(200).send(responseToSend);
             }
         }
        
@@ -93,12 +97,16 @@ const login = asyncHandler(async(req,res,next)=>{
         throw new Error("ERROR IN LOGIN OF USERCONTROLLER");
     }
    
-})
+});
+
+
+
 
 module.exports = {
     findAllUsers,
     getConnections,
     addNewUser,
     checkUserName,
-    login
+    login,
+    
 }

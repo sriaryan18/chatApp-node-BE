@@ -33,7 +33,7 @@ const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername)=>{
          {username:fromUsername}
         );
          if(user){
-            const connectRequests = user?.connectRequests;
+            const connectRequests = user?.connectRequestsSent;
             let isPresent = false;
             connectRequests.forEach((req)=>{
                 if(req.targetUsername === toUsername) isPresent = true;
@@ -47,20 +47,24 @@ const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername)=>{
         return false;
     }
 }
-const saveConnectionRequest = async (from,to)=>{
+const saveConnectionRequestSent = async (from,to)=>{
     try{
         const result = await User.updateOne(
             { username: from },
             {
               $push: {
-                connectRequests: { targetUsername: to }
+                connectRequestsSent: {
+                  $each: [{ targetUsername: to }],
+                  $position: 0
+                }
               }
             }
           );
           
+          
           console.log("Number of documents updated:", result);
           
-          return result?true:false   ;
+          return result?true:false;
         
     }catch(err){
         console.log("err",err)
@@ -68,4 +72,26 @@ const saveConnectionRequest = async (from,to)=>{
     }
 }
 
-module.exports = {saveMessageDb,checkDatabaseIfReqAlreadySent,saveConnectionRequest}
+
+const saveConnectionRequestReceived = async (to,from,type)=>{
+    try{
+
+        const result  = await User.updateOne(
+            {username:to},
+            {
+                $push:{
+                    notifications:{
+                      $each:[{type:type,from:from}],
+                      $position: 0 
+                    }
+                }
+            }
+        );
+        return result?true:false;
+    }catch(err){
+        console.log("err",err);
+        return false;
+    }
+}
+
+module.exports = {saveMessageDb,checkDatabaseIfReqAlreadySent,saveConnectionRequestSent,saveConnectionRequestReceived}

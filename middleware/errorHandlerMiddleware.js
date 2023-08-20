@@ -3,7 +3,7 @@ const errorHandler = (err,req,res,next)=>{
     res.send("ERROR OCCURED")
 }
 const notFound = (req,res,next)=>{
-    res.send("NOT FOUND");
+    res.status(400).send("NOT FOUND");
 
 }
 

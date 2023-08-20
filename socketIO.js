@@ -1,4 +1,4 @@
-const {saveMessageDb, checkDatabaseIfReqAlreadySent, saveConnectionRequest}  = require('./utils/DatabaseUtils')
+const {saveMessageDb, checkDatabaseIfReqAlreadySent, saveConnectionRequest, saveConnectionRequestSent, saveConnectionRequestReceived}  = require('./utils/DatabaseUtils')
 
 const SocketIo = (io)=>{
     const onlineUsers={};
@@ -52,7 +52,8 @@ const SocketIo = (io)=>{
                     if(targetUserSocket){
                         targetUserSocket.emit('friendRequest',{from});
                     }
-                    await saveConnectionRequest(from,to);
+                    await saveConnectionRequestSent(from,to);
+                    await saveConnectionRequestReceived(to,from,'requested');
                 }
             }catch(err){
                 console.log("Something went wrong...",err)

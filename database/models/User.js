@@ -8,9 +8,14 @@ const userSchema =  new Schema({
   password: { type: String, required: true },
   lastLogin: { type: Date, default: null },
   emailId: { type: String, required: true },
-  connectRequests :[{
-    targetUsername:{type:String,ref:'User'},
-    timeStamp:{type:Date,default:Date.now}
+    connectRequestsSent :[{
+      targetUsername:{type:String},
+      timeStamp:{type:Date,default:Date.now}
+    }],
+  notifications:[{
+    type:{type:String,enum:['accepted','requested']},
+    from:{type:String},
+    timeStamp:{type:Date, default:Date.now},
   }],
   connects:[
     {
@@ -32,7 +37,18 @@ userSchema.pre('save',  async function(next){
    const salt= await bcrypt.genSalt(10);
   const hashedPassword= await bcrypt.hash(this.password,salt);
   this.password = hashedPassword;
-
+});
+userSchema.virtual('LoginSuccessData').get(function(){
+    return{
+      username:this.username, 
+      name:this.name,
+      email:this.emailId,
+      meta:this.meta,
+      notifications:{ 
+          sent:this.connectRequestsSent.slice(0,5),
+          notificationsReceived:this.notifications.slice(0,10)
+      }
+    }
 })
 
 
