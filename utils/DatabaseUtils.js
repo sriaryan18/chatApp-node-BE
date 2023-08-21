@@ -1,5 +1,6 @@
 const  Chat = require("../database/models/Chat");
 const  Message = require("../database/models/Messages");
+const Notification = require("../database/models/Notification");
 const User = require("../database/models/User");
 
 const saveMessageDb = async (data)=>{
@@ -26,46 +27,40 @@ const saveMessageDb = async (data)=>{
 }
 
 
-const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername)=>{
+const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername,type = 'request')=>{
     try{
+        const notification = await  Notification.findOne({
+            destinatedUsername:toUsername
+        });
+        
+        return notification?.checkIfNotificationSent(fromUsername,toUsername,type='request');
 
-        const user =await User.findOne(
-         {username:fromUsername}
-        );
-         if(user){
-            const connectRequests = user?.connectRequestsSent;
-            let isPresent = false;
-            connectRequests.forEach((req)=>{
-                if(req.targetUsername === toUsername) isPresent = true;
-            });
-            console.log('isPresent',isPresent);
-            return isPresent;
-         }
-      
     }catch(err){
-        console.log("error at check",err)
-        return false;
+        console.log("Something went wrong for checking db if request exists by",fromUsername,"to",toUsername,err);
     }
 }
 const saveConnectionRequestSent = async (from,to)=>{
     try{
-        const result = await User.updateOne(
-            { username: from },
-            {
-              $push: {
-                connectRequestsSent: {
-                  $each: [{ targetUsername: to }],
-                  $position: 0
+        const options = {
+            new:true,
+            upsert:true,
+            setDefaultsOnInsert:true
+        }
+        const query  = {destinatedUsername:to};
+        const notificationData = {
+            originatedFromUsername:from,
+            type:'request'
+        }
+        const updateData = {
+            $push:{notifications:{
+                    $each:[{...notificationData}],
+                    $position:0
                 }
-              }
             }
-          );
-          
-          
-          console.log("Number of documents updated:", result);
-          
-          return result?true:false;
-        
+        }
+
+       const notification = await Notification.findOneAndUpdate(query,updateData,options);   
+       console.log("I am updated data of notifications data",notification);
     }catch(err){
         console.log("err",err)
         return false;

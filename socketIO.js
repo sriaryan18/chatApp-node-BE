@@ -42,18 +42,18 @@ const SocketIo = (io)=>{
             console.log("I am online users after a disconnection",Object.keys(onlineUsers));
         })
         socket.on('friend-request',async (data)=>{
-            const {to,from} = data;
-            if(to === from) return;
+            const {destinatedUsername,originatedFromUsername,type} = data;
+            if(originatedFromUsername === destinatedUsername) return;
             try{
-                const isAlreadySent=await checkDatabaseIfReqAlreadySent(from,to);
+                const isAlreadySent=await checkDatabaseIfReqAlreadySent(originatedFromUsername,destinatedUsername,type);
                 console.log('I am AlreadySent',isAlreadySent);
                 if(!isAlreadySent){
-                    const targetUserSocket = onlineUsers[to];
+                    const targetUserSocket = onlineUsers[destinatedUsername];
                     if(targetUserSocket){
-                        targetUserSocket.emit('friendRequest',{from});
+                        targetUserSocket.emit('friendRequest',{originatedFromUsername});
                     }
-                    await saveConnectionRequestSent(from,to);
-                    await saveConnectionRequestReceived(to,from,'requested');
+                    await saveConnectionRequestSent(originatedFromUsername,destinatedUsername);
+                    // await saveConnectionRequestReceived(to,from,'requested');
                 }
             }catch(err){
                 console.log("Something went wrong...",err)

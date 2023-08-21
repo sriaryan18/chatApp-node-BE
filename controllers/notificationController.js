@@ -1,11 +1,11 @@
 const asyncHandler=require('express-async-handler');
-const User = require('../database/models/User');
+const Notification = require('../database/models/Notification');
 const getNotifications = asyncHandler(async(req,res)=>{
     try{
         const username  = req.query.username;
         const offset = req.query.offset;
-        const user = await User.findOne({
-            username:username
+        const user = await Notification.findOne({
+            destinatedUsername:username
         });
         if(username){
             const notifications = user.notifications.slice(offset,offset+10);
