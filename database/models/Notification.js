@@ -32,6 +32,19 @@ notificationSchema.methods.checkIfNotificationSent = async function(from,to,type
     return res;
 }
 
+notificationSchema.methods.acceptOrDeleteReq = async function(originatedFromUsername,type){
+    
+    for (let i = 0;i<this.notifications.length;i++){
+        if(this.notifications[i].originatedFromUsername === originatedFromUsername && this.notifications[i].type==type){
+            this.notifications.splice(i,1);
+            console.log("I am nObj",type,this.notifications);
+            await this.save();
+            return true;
+        }
+    }
+    return false;
+}
+
 notificationSchema.virtual('count').get(function(){
     return this.notifications.length;
 })

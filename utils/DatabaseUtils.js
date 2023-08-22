@@ -32,14 +32,13 @@ const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername,type = 'req
         const notification = await  Notification.findOne({
             destinatedUsername:toUsername
         });
-        
-        return notification?.checkIfNotificationSent(fromUsername,toUsername,type='request');
+        return notification?.checkIfNotificationSent(fromUsername,toUsername,type);
 
     }catch(err){
         console.log("Something went wrong for checking db if request exists by",fromUsername,"to",toUsername,err);
     }
 }
-const saveConnectionRequestSent = async (from,to)=>{
+const saveConnectionRequestSent = async (from,to,type)=>{
     try{
         const options = {
             new:true,
@@ -49,7 +48,7 @@ const saveConnectionRequestSent = async (from,to)=>{
         const query  = {destinatedUsername:to};
         const notificationData = {
             originatedFromUsername:from,
-            type:'request'
+            type:type
         }
         const updateData = {
             $push:{notifications:{
@@ -68,25 +67,26 @@ const saveConnectionRequestSent = async (from,to)=>{
 }
 
 
-const saveConnectionRequestReceived = async (to,from,type)=>{
-    try{
+// const saveConnectionRequestReceived = async (to,from,type)=>{
+//     try{
 
-        const result  = await User.updateOne(
-            {username:to},
-            {
-                $push:{
-                    notifications:{
-                      $each:[{type:type,from:from}],
-                      $position: 0 
-                    }
-                }
-            }
-        );
-        return result?true:false;
-    }catch(err){
-        console.log("err",err);
-        return false;
-    }
-}
+//         const result  = await User.updateOne(
+//             {username:to},
+//             {
+//                 $push:{
+//                     notifications:{
+//                       $each:[{type:type,from:from}],
+//                       $position: 0 
+//                     }
+//                 }
+//             }
+//         );
+//         return result?true:false;
+//     }catch(err){
+//         console.log("err",err);
+//         return false;
+//     }
+// }
 
-module.exports = {saveMessageDb,checkDatabaseIfReqAlreadySent,saveConnectionRequestSent,saveConnectionRequestReceived}
+
+module.exports = {saveMessageDb,checkDatabaseIfReqAlreadySent,saveConnectionRequestSent}

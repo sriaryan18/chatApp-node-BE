@@ -1,4 +1,4 @@
-const {saveMessageDb, checkDatabaseIfReqAlreadySent, saveConnectionRequest, saveConnectionRequestSent, saveConnectionRequestReceived}  = require('./utils/DatabaseUtils')
+const {saveMessageDb, checkDatabaseIfReqAlreadySent, saveConnectionRequest, saveConnectionRequestSent}  = require('./utils/DatabaseUtils')
 
 const SocketIo = (io)=>{
     const onlineUsers={};
@@ -6,7 +6,6 @@ const SocketIo = (io)=>{
 
     io.on('connection',(socket)=>{
         console.log("Client connected",socket.id);
-        // autheticateJWTwebSockets(socket);
         socket.on('iAmOnline',(data)=>{
             onlineUsers[data.username] = socket;
             reverseLoopkup[socket.id] = data.username;
@@ -33,14 +32,14 @@ const SocketIo = (io)=>{
             catch(err){
                 console.log(`${data.to} is not available`);
             }
-        })
+        });
 
         socket.on('disconnect',()=>{
             const usernameDisconnected = reverseLoopkup[socket.id];
             delete onlineUsers[usernameDisconnected];
             delete reverseLoopkup[socket.id];
             console.log("I am online users after a disconnection",Object.keys(onlineUsers));
-        })
+        });
         socket.on('friend-request',async (data)=>{
             const {destinatedUsername,originatedFromUsername,type} = data;
             if(originatedFromUsername === destinatedUsername) return;
@@ -50,17 +49,14 @@ const SocketIo = (io)=>{
                 if(!isAlreadySent){
                     const targetUserSocket = onlineUsers[destinatedUsername];
                     if(targetUserSocket){
-                        targetUserSocket.emit('friendRequest',{originatedFromUsername});
+                        targetUserSocket.emit('friendRequest',{originatedFromUsername,type});
                     }
-                    await saveConnectionRequestSent(originatedFromUsername,destinatedUsername);
-                    // await saveConnectionRequestReceived(to,from,'requested');
+                    await saveConnectionRequestSent(originatedFromUsername,destinatedUsername,type  );
                 }
             }catch(err){
                 console.log("Something went wrong...",err)
             }
-            
-
-        })
+        });
     });
 }
 

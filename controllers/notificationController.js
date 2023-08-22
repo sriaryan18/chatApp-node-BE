@@ -17,19 +17,30 @@ const getNotifications = asyncHandler(async(req,res)=>{
     }
 });
 
-/**\
- * Accepting the request means remove the request from notifications 
- * and add the user in connects with a new chatID in both the user's connect box.
- */
-
-const acceptRequest = asyncHandler(async(req,res)=>{
-    //  step1
-    const username = req.query.username;
-     
+const acceptOrDeleteRequest = asyncHandler(async(req,res)=>{
+    try{
+        const destinatedUsername = req.query.destinatedUsername;
+        const originatedFromUsername = req.query.originatedFromUsername;
+        const type = req.query.type;
+        const notificationObj = await Notification.findOne({
+            destinatedUsername:destinatedUsername
+        });
+        response = await notificationObj?.acceptOrDeleteReq(originatedFromUsername,type);
+        console.log(">>>",response)
+        if(response==true){
+            res.status(200).send("Operation Successfull....")
+        }
+        else{
+            res.status(500).send("Operation UnSuccessfull....")
+        }
+    }catch(err){
+        console.log("Something went went wrong ", err);
+    }
 })
 
 
 
 module.exports={
-    getNotifications
+    getNotifications,
+    acceptOrDeleteRequest
 }
