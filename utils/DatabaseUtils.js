@@ -32,10 +32,18 @@ const checkDatabaseIfReqAlreadySent = async (fromUsername,toUsername,type = 'req
         const notification = await  Notification.findOne({
             destinatedUsername:toUsername
         });
+        const fromUser = await User.findOne({username:fromUsername});
+        
+        const ifFriends=fromUser?.checkIfAlreadyFriends(toUsername);
+        console.log("I am isFriends",fromUser)
+        if(ifFriends){
+            return "Already Friends"
+        }
         return notification?.checkIfNotificationSent(fromUsername,toUsername,type);
 
     }catch(err){
         console.log("Something went wrong for checking db if request exists by",fromUsername,"to",toUsername,err);
+        return true; // sending this to abort the process of sending the friend request
     }
 }
 const saveConnectionRequestSent = async (from,to,type)=>{

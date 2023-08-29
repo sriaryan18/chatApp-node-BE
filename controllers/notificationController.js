@@ -1,5 +1,8 @@
 const asyncHandler=require('express-async-handler');
 const Notification = require('../database/models/Notification');
+const User = require('../database/models/User');
+const Chat = require('../database/models/Chat');
+
 const getNotifications = asyncHandler(async(req,res)=>{
     try{
         const username  = req.query.username;
@@ -26,21 +29,42 @@ const acceptOrDeleteRequest = asyncHandler(async(req,res)=>{
             destinatedUsername:destinatedUsername
         });
         response = await notificationObj?.acceptOrDeleteReq(originatedFromUsername,type);
-        console.log(">>>",response)
+        console.log("I am type",type)
+        // add to connects
+        if(type ==='accept'){
+            res.status(200).send("Successfully deleted from DB");
+            return;
+        }
+
+        const chat = await Chat.create({
+            chatType:'personal'
+        });
+        const chatId = chat._id.toString(); 
+
+        const u1 = await User.findOne({
+            username:destinatedUsername
+        });
+        const u2 = await User.findOne({
+            username:originatedFromUsername
+        });
+        u1.addToConnect(originatedFromUsername,chatId);
+        u2.addToConnect(destinatedUsername,chatId);
+
+
         if(response==true){
-            res.status(200).send("Operation Successfull....")
+            res.status(200).send(chatId);
         }
         else{
-            res.status(500).send("Operation UnSuccessfull....")
+            res.status(500).send("Operation UnSuccessfull....");
         }
     }catch(err){
         console.log("Something went went wrong ", err);
     }
-})
+});
 
 
 
 module.exports={
     getNotifications,
     acceptOrDeleteRequest
-}
+};

@@ -27,17 +27,36 @@ const userSchema =  new Schema({
   meta: { type: mongoose.Schema.Types.Mixed },
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) { 
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 
+
 userSchema.pre('save',  async function(next){
-  if(!this.isModified) next();
-   const salt= await bcrypt.genSalt(10);
+  if(!this.isModified('password')) next();
+  console.log("I am password");
+  const salt= await bcrypt.genSalt(10);
   const hashedPassword= await bcrypt.hash(this.password,salt);
   this.password = hashedPassword;
 });
+
+userSchema.methods.checkIfAlreadyFriends =  function(toUsername){
+  const l = this.connects;
+   for(let i=0;i<l.length;i++){
+    if(l[i].username === toUsername) return true;
+   }
+   return false;
+}
+userSchema.methods.addToConnect = async function(username,chatId){
+  console.log("I am at originatedFromUsername,chatId",username,chatId);
+  this.connects.push({
+    username:username,
+    chatId:chatId
+  });
+  await this.save();
+}
+
 userSchema.virtual('LoginSuccessData').get(function(){
     return{
       username:this.username, 
@@ -49,7 +68,7 @@ userSchema.virtual('LoginSuccessData').get(function(){
           notificationsReceived:this.notifications.slice(0,10)
       }
     }
-})
+});
 
 
 const User= mongoose.model("User",userSchema);
