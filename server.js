@@ -2,7 +2,8 @@ const bodyParser = require('body-parser');
 const {connectDB} = require('./database/connection');
 require("dotenv").config();
 const {errorHandler,notFound} = require('./middleware/errorHandlerMiddleware');
-const userRoutes = require('./routes/userRoutes')
+const userRoutes = require('./routes/userRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const express = require('express');
 const cors = require('cors');
 const {SocketIo}  = require('./socketIO');
@@ -29,7 +30,8 @@ app.get('/',(req,res)=>{
     res.send("HELLO FROM CHAT APP");
 });
 
-app.use('/user',userRoutes)
+app.use('/user',userRoutes);
+app.use('/chat',chatRoutes);
 app.use(errorHandler);
 app.use(notFound);
  

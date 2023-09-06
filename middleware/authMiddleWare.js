@@ -8,7 +8,9 @@ const authenticateJWT = (req,res,next)=>{
             return res.status(401).json({ message: 'Token missing' });
         }
         const isVerified = jwt.verify(token,process.env.SECRET_KEY_LOGIN);
-        if(isVerified) next();
+        if(isVerified){ 
+            console.log("Authenticated")
+            next();}
         else {
         res.status(401).send("NOT AUTHORIZED TO VIEW THIS ROUTE")
         }

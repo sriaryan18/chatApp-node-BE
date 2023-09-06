@@ -1,11 +1,15 @@
-const { default:Chat } = require('../database/models/Chat');
+const Chat  = require('../database/models/Chat');
+const Message = require('../database/models/Messages');
 
-const allMessagesById = async (req,res)=>{
+const getMessages = async (req,res)=>{
     const chatID = req.query.chatID;
+    // const offset = req.query.offset; // TODO
     try{
-
         const chat = await Chat.findById(chatID);
         if(chat){
+            const actualMessages =  await Message.find({
+                _id:{$in:chatID.messages}
+            });
             res.status(200).send(chat.messages);  // :TODO send this based on pagination or limit the number of messages
         }
 
@@ -18,5 +22,5 @@ const allMessagesById = async (req,res)=>{
 
 
 module.exports = {
-    allMessagesById
+    getMessages
 }

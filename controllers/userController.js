@@ -17,7 +17,7 @@ const getConnections = asyncHandler(async (req,res)=>{
     if(!connections){
         res.status(400).send("No Connections found")
     }
-    console.log("I am user",connections.connects)
+    // console.log("I am user",connections.connects)
     
     res.send(JSON.stringify(connections.connects));
 });

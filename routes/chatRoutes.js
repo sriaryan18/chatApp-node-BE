@@ -1,5 +1,9 @@
-const { allMessagesById } = require('../controllers/chatController');
+const { getMessages } = require('../controllers/chatController');
+const { authenticateJWT } = require('../middleware/authMiddleWare');
 
 const router = require('express').Router();
+router.use(authenticateJWT);
+router.route('/').get(getMessages);
 
-router.route('/chat').get(allMessagesById)
+module.exports = router;
+
