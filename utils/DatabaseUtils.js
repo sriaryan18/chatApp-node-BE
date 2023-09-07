@@ -5,7 +5,7 @@ const User = require("../database/models/User");
 
 const saveMessageDb = async (data)=>{
     try{
-         const chatID = data.chatID;
+         const chatID = data.chatId;
     const message = await Message.create({
         message:data.message,
         sender:data.from,
@@ -15,11 +15,10 @@ const saveMessageDb = async (data)=>{
         type:data.type
     });
     const messageId = message._id;
-    await Chat.create({
-        chatType:data.type || "personal",
-        messages:messageId
-    });
-
+    const chat = await Chat.updateOne(
+        { _id: chatID },
+        { $push: { messages: message._id } }
+      );
     }catch(err){
         console.log("Error at saving sent message",err);
     }

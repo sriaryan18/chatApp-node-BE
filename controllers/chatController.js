@@ -7,10 +7,12 @@ const getMessages = async (req,res)=>{
     try{
         const chat = await Chat.findById(chatID);
         if(chat){
-            const actualMessages =  await Message.find({
-                _id:{$in:chatID.messages}
+            const actualMessages = await Message.find({
+                _id: { $in: chat.messages }
             });
-            res.status(200).send(chat.messages);  // :TODO send this based on pagination or limit the number of messages
+            
+            console.log("I am actual mwssages",actualMessages,chatID);
+            res.status(200).send(actualMessages);  // :TODO send this based on pagination or limit the number of messages
         }
 
     }catch(err){

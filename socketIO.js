@@ -17,7 +17,7 @@ const SocketIo = (io)=>{
                 console.log("I am msg",data)
                  saveMessageDb(data);
                 const receiver = data.to;
-                onlineUsers[receiver].emit('message-personal',data.message);
+                onlineUsers[receiver].emit('message-personal',data);
             }catch(err){
                 console.log(`${data.to} is not online`); // push the message to message cache of the receiver
             }
