@@ -40,7 +40,7 @@ const SocketIo = (io)=>{
             delete reverseLoopkup[socket.id];
             console.log("I am online users after a disconnection",Object.keys(onlineUsers));
         });
-        socket.on('friend-request',async (data)=>{
+        socket.on('friendRequest',async (data)=>{
             const {destinatedUsername,originatedFromUsername,type} = data;
             if(originatedFromUsername === destinatedUsername) return;
             try{

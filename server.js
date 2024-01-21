@@ -1,13 +1,15 @@
 const bodyParser = require('body-parser');
 const {connectDB} = require('./database/connection');
 require("dotenv").config();
-const {errorHandler,notFound} = require('./middleware/errorHandlerMiddleware');
+const {errorHandler,notFound} =
+    require('./middleware/errorHandlerMiddleware');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const express = require('express');
 const cors = require('cors');
 const {SocketIo}  = require('./socketIO');
-const { authenticateJWT, autheticateJWTsockets } = require('./middleware/authMiddleWare');
+const { authenticateJWT, autheticateJWTsockets }
+    = require('./middleware/authMiddleWare');
 const app =express();
 
 const server =require('http').createServer(app)

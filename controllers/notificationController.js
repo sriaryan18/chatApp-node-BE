@@ -51,7 +51,7 @@ const acceptOrDeleteRequest = asyncHandler(async(req,res)=>{
         u2.addToConnect(destinatedUsername,chatId);
 
 
-        if(response==true){
+        if(response===true){
             res.status(200).send(chatId);
         }
         else{
