@@ -73,6 +73,15 @@ const saveConnectionRequestSent = async (from,to,type)=>{
     }
 }
 
+ const deleteNotification =async ({destinatedUsername,originatedFromUsername}) => {
+    const notification = await Notification.findOne({
+        destinatedUsername: destinatedUsername
+    });
+    console.log('I am notificayion delete',notification,destinatedUsername,originatedFromUsername);
+    if(notification){
+        notification.removeNotification(destinatedUsername,originatedFromUsername);
+    }
+}
 
 // const saveConnectionRequestReceived = async (to,from,type)=>{
 //     try{
@@ -96,4 +105,4 @@ const saveConnectionRequestSent = async (from,to,type)=>{
 // }
 
 
-module.exports = {saveMessageDb,checkDatabaseIfReqAlreadySent,saveConnectionRequestSent}
+module.exports = {saveMessageDb,checkDatabaseIfReqAlreadySent,saveConnectionRequestSent,deleteNotification}

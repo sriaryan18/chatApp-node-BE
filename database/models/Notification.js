@@ -31,6 +31,20 @@ notificationSchema.methods.checkIfNotificationSent = async function(from,to,type
     });
     return res;
 }
+notificationSchema.methods.removeNotification = async function(destinatedUsername,originatedUsername){
+    console.log('HIIII',destinatedUsername,originatedUsername)
+   for(let i = 0;i<this.notifications.length;i++){
+       if(this.notifications[i].originatedFromUsername === originatedUsername){
+           this.notifications.splice(i,1);
+           await this.save();
+           return true;
+       }
+   }
+    if(this.notifications.length === 0) {
+        await this.deleteOne()
+    }
+   return false;
+}
 
 notificationSchema.methods.acceptOrDeleteReq = async function(originatedFromUsername,type){
     

@@ -1,4 +1,8 @@
-const {saveMessageDb, checkDatabaseIfReqAlreadySent, saveConnectionRequest, saveConnectionRequestSent}  = require('./utils/DatabaseUtils')
+const {saveMessageDb,
+    checkDatabaseIfReqAlreadySent,
+    saveConnectionRequest,
+    saveConnectionRequestSent, deleteNotification
+}  = require('./utils/DatabaseUtils')
 
 const SocketIo = (io)=>{
     const onlineUsers={};
@@ -57,6 +61,10 @@ const SocketIo = (io)=>{
                 console.log("Something went wrong...",err)
             }
         });
+        socket.on('friendRequestDelete', (data)=> {
+            deleteNotification(data)
+
+        })
     });
 }
 
