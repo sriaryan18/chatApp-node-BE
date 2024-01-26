@@ -4,7 +4,7 @@ const asyncHandler=require('express-async-handler');
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken')
 const User = require('../database/models/User');
-
+const Notifications = require('../database/models/Notification');
 const findAllUsers = asyncHandler(async (req,res)=>{
     const users=await User.find({});
     res.send(JSON.stringify(users));
@@ -61,7 +61,7 @@ const checkUserName = asyncHandler(async (req,res)=>{
     const user=await User.findOne({
         'username':username
     });
-    res.send( user?false:true);
+    res.send(!user);
 });
 
 const login = asyncHandler(async(req,res,next)=>{
@@ -86,7 +86,15 @@ const login = asyncHandler(async(req,res,next)=>{
                 const token = jwt.sign({username},process.env.SECRET_KEY_LOGIN,{
                     expiresIn:process.env.JWT_EXPIRE_TIME
                 });
-                const responseToSend={userInfo:isUsernamePresent.LoginSuccessData,token};
+
+                const notificationObj = await Notifications.findOne({destinatedUsername:username}) ?? {notifications:[]};
+
+                const responseToSend={userInfo: {
+                        ...isUsernamePresent.LoginSuccessData,
+                        notifications: {
+                            notificationsReceived:  notificationObj?.notifications
+                    }
+                    },token};
 
                 res.status(200).send(responseToSend);
             }

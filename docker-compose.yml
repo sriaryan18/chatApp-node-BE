@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: .
+    links:
+      - "mongo-db"
+    ports:
+      - "3000:3000"
+    command: npm start
+
+  mongo-db:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"

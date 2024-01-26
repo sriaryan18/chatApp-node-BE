@@ -77,7 +77,6 @@ const saveConnectionRequestSent = async (from,to,type)=>{
     const notification = await Notification.findOne({
         destinatedUsername: destinatedUsername
     });
-    console.log('I am notificayion delete',notification,destinatedUsername,originatedFromUsername);
     if(notification){
         notification.removeNotification(destinatedUsername,originatedFromUsername);
     }
