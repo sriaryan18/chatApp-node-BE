@@ -3,6 +3,7 @@ const {saveMessageDb,
     saveConnectionRequest,
     saveConnectionRequestSent, deleteNotification
 }  = require('./utils/DatabaseUtils')
+const {checkIfUserOnline} = require("./utils/helper");
 
 const SocketIo = (io)=>{
     const onlineUsers={};
@@ -63,6 +64,39 @@ const SocketIo = (io)=>{
         });
         socket.on('friendRequestDelete', (data)=> {
             deleteNotification(data)
+        });
+        socket.on('videoCall',(data)=>{
+            try{
+                const {destinatedUsername,sourceUsername,offer = null,type} = data;
+                if(type === 'REQUEST'){
+                    const isOnline = checkIfUserOnline(onlineUsers,destinatedUsername);
+                    if(!isOnline){
+                        onlineUsers[sourceUsername].emit('videoCall',{
+                            status:'OFFLINE',
+                            message:'USER IS OFFLINE'
+                        })
+                    }else{
+                        onlineUsers[destinatedUsername].emit('videoCall',{
+                            status:'CALL_RECEIVING',
+                            originatedFrom : sourceUsername,
+                            offer
+                        })
+                    }
+
+                }
+                else if(type ==='CALL_CUT'){
+                    const isOnline = checkIfUserOnline(onlineUsers,destinatedUsername);
+                    if(isOnline){
+                        onlineUsers[destinatedUsername].emit('videoCall',{
+                            type,
+                            message:'USER CUT THE CALL'
+                        })
+                    }
+                }
+
+            }catch (e){
+
+            }
 
         })
     });
