@@ -65,41 +65,57 @@ const SocketIo = (io)=>{
         socket.on('friendRequestDelete', (data)=> {
             deleteNotification(data)
         });
-        socket.on('videoCall',(data)=>{
+        socket.on('videoCallRequest',(data)=>{
             try{
-                const {destinatedUsername,sourceUsername,offer = null,type} = data;
-                if(type === 'REQUEST'){
-                    const isOnline = checkIfUserOnline(onlineUsers,destinatedUsername);
-                    if(!isOnline){
-                        onlineUsers[sourceUsername].emit('videoCall',{
-                            status:'OFFLINE',
-                            message:'USER IS OFFLINE'
-                        })
-                    }else{
-                        onlineUsers[destinatedUsername].emit('videoCall',{
-                            status:'CALL_RECEIVING',
-                            originatedFrom : sourceUsername,
-                            offer
-                        })
-                    }
-
+                console.log('ncdjksn');
+                const {destinatedUsername,sourceUsername,offer = null} = data;
+                const isOnline = checkIfUserOnline(onlineUsers,destinatedUsername);
+                if(!isOnline){
+                    onlineUsers[sourceUsername].emit('videoCallResponse-client',{ // NOTE: both *-client can be clubbed but making them seperate for UI .
+                        type:'OFFLINE',
+                        message:'USER IS OFFLINE'
+                    })
+                }else{
+                    console.log("I am online",data);
+                    onlineUsers[destinatedUsername].emit('videoCallRequest-client',{
+                        type:'CALL_RECEIVING',
+                        originatedFrom : sourceUsername,
+                        offer
+                    })
                 }
-                else if(type ==='CALL_CUT'){
-                    const isOnline = checkIfUserOnline(onlineUsers,destinatedUsername);
-                    if(isOnline){
-                        onlineUsers[destinatedUsername].emit('videoCall',{
-                            type,
-                            message:'USER CUT THE CALL'
-                        })
-                    }
+            }catch (e) {
+                console.log(e)
+            }
+        });
+        socket.on('videoCallResponse',(data)=>{
+            const {destinatedUsername,sourceUsername,offer = null,type} = data;
+            console.log(data,'at videoCallResponse')
+            const isUserOnline = checkIfUserOnline(onlineUsers,destinatedUsername);
+            /**
+             * accepted types are : CALL_CUT, BUZY,
+             *
+             */
+            if(isUserOnline){
+                if(type === 'CALL_CUT' || type === 'BUZY'){
+                    const message = type === 'CALL_CUT' ? 'USER CUT THE CALL' : 'USER IS BUZY IN ANOTHER CALL'
+                    onlineUsers[destinatedUsername].emit('videoCallResponse-client',{
+                        type,
+                        message
+                    })
                 }
-
-            }catch (e){
-
+                else{
+                    onlineUsers[destinatedUsername].emit('videoCallResponse-client',{
+                        type,
+                        destinatedUsername,
+                        originatedFromUsername: sourceUsername,
+                        offer
+                    })
+                }
             }
 
         })
     });
+
 }
 
 module.exports = {SocketIo};
